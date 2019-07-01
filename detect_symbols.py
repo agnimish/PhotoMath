@@ -90,6 +90,14 @@ for i in range(0,10):
 
 print(acc/cnt)
 
+## COMMENTED code for testing on the symbols created which was pretty good in prediction
+# gray = cv2.imread('symbols/8.jpg', 1)
+# gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
+# gray = cv2.resize(255-gray, (28, 28))
+# flatten = gray.flatten() / 255.0
+# pred = model.predict(flatten.reshape(1, 28, 28, 1))
+# print(pred.argmax())
+
 #---------------------------------------------------------------------------------
 
 ## creating contours in orignal image
@@ -97,32 +105,41 @@ print(acc/cnt)
 # code for contours
 
 
-im = cv2.imread('Img2.jpg') ## image to evaluate
+im = cv2.imread('Img4.jpg') ## image to evaluate
 imgray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
 imgray = cv2.blur(imgray,(10,10))
 
 
-ret,thresh = cv2.threshold(imgray,127,255,cv2.THRESH_BINARY)
+#ret,thresh = cv2.threshold(imgray,127,255,cv2.THRESH_BINARY)
 
 _,contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE) ## cCreating contours
 list=[]
 i=0
 for cnt in contours:
 	x,y,w,h = cv2.boundingRect(cnt)
-	if w > 100 and h > 100:
-		x=im[y:y + h, x:x + w,:]
+	if w > 30 and h > 30:
+		img=im[y-15:y + h+15, x-15:x + w+15:]
+		gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+		gray = cv2.resize(255 - gray, (28, 28))
 		M = cv2.moments(cnt)
 		Cx = M['m10'] / M['m00']
 		Cy = M['m01'] / M['m00']
-		list.append((x,Cx,Cy))
+		list.append((gray,Cx,Cy))
 		#cv2.imwrite(str(i)+'.png',x)
 	i=i+1
 
 
-for cnt in contours:
-	x,y,w,h = cv2.boundingRect(cnt)
-	#bound the images
-	cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),3)
+# for cnt in contours:
+# 	x,y,w,h = cv2.boundingRect(cnt)
+# 	#bound the images
+# 	cv2.rectangle(im,(x-15,y-15),(x+w+15,y+h+15),(0,255,0),3)
+
+## REmove all images in the symbols folder
+d='/home/harshit/PycharmProjects/photomath/symbols'
+filesToRemove = [os.path.join(d,f) for f in os.listdir()]
+for f in filesToRemove:
+    os.path.join("/home/harshit/PycharmProjects/photomath/symbols", f)
+## ---------------------------------------------------------------
 
 i=0
 for cnt in contours:
@@ -130,9 +147,25 @@ for cnt in contours:
 	#following if statement is to ignore the noises and save the images which are of normal size(character)
 	#In order to write more general code, than specifying the dimensions as 100,
 	# number of characters should be divided by word dimension
-	if (w>30 and h>30):#or(w>100 and h<30):
+	if (w>30 and h>30) or (w>100 and h<30):
 		#save individual images
 		plt.imshow(thresh[y:y+h,x:x+w])
 		plt.show(10)
-		cv2.imwrite('/home/harshit/PycharmProjects/photomath/symbols/'+str(i)+".jpg",thresh[y:y+h,x:x+w])
+		cv2.imwrite('/home/harshit/PycharmProjects/photomath/symbols/'+str(i)+".jpg",thresh[y-15:y+h+15,x-15:x+w+15])
 	i=i+1
+
+
+print(list[0][0])
+print(list[0][0][0])
+plt.imshow(list[1][0])
+plt.show(10)
+for i in list:
+
+	plt.imshow(i[0])
+	plt.show(10)
+	print(i[0].shape)
+	print(i[1])
+	print(i[2])
+	flatten = i[0].flatten() / 255.0
+	pred = model.predict(flatten.reshape(1, 28, 28, 1))
+	print(pred.argmax())
