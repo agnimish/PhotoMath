@@ -154,11 +154,7 @@ for cnt in contours:
 		cv2.imwrite('/home/harshit/PycharmProjects/photomath/symbols/'+str(i)+".jpg",thresh[y-15:y+h+15,x-15:x+w+15])
 	i=i+1
 
-
-print(list[0][0])
-print(list[0][0][0])
-plt.imshow(list[1][0])
-plt.show(10)
+## predicts the symbols 
 for i in list:
 
 	plt.imshow(i[0])
