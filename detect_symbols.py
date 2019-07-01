@@ -10,7 +10,7 @@ pd.options.display.float_format = '{:,.2f}'.format
 
 
 ## Creating train and test data
-
+cnt=0
 x_train=[]
 y_train=[]
 for i in range(0,10):
@@ -110,7 +110,20 @@ imgray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
 imgray = cv2.blur(imgray,(10,10))
 
 
-#ret,thresh = cv2.threshold(imgray,127,255,cv2.THRESH_BINARY)
+ret,thresh = cv2.threshold(imgray,127,255,cv2.THRESH_BINARY)
+
+
+class symbols:
+  def __init__(myobject,x,y,w,h,Cx,Cy,pred,aspect):
+    myobject.y = y
+    myobject.x = x
+    myobject.w = w
+    myobject.h = h
+    myobject.Cx = Cx
+    myobject.Cy = Cy
+    myobject.pred = pred
+    myobject.aspect=aspect
+
 
 _,contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE) ## cCreating contours
 list=[]
@@ -121,18 +134,19 @@ for cnt in contours:
 		img=im[y-15:y + h+15, x-15:x + w+15:]
 		gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 		gray = cv2.resize(255 - gray, (28, 28))
+		flatten = gray.flatten() / 255.0
+		pred = model.predict(flatten.reshape(1, 28, 28, 1))
+		aspect_ratio=w/h
 		M = cv2.moments(cnt)
 		Cx = M['m10'] / M['m00']
 		Cy = M['m01'] / M['m00']
-		small=[]
-		small.append(gray)
-		small.append(Cx)
-		small.append(Cy)
-		list.append(small)
+		s = symbols(x,y,w,h,Cx,Cy,pred.argmax(),aspect_ratio)
+        list.append(s)
 		#cv2.imwrite(str(i)+'.png',x)
 	i=i+1
 
-
+x=[ i.pred for i in list]
+print(x)
 # for cnt in contours:
 # 	x,y,w,h = cv2.boundingRect(cnt)
 # 	#bound the images
@@ -158,25 +172,13 @@ for cnt in contours:
 		cv2.imwrite('/home/harshit/PycharmProjects/photomath/symbols/'+str(i)+".jpg",thresh[y-15:y+h+15,x-15:x+w+15])
 	i=i+1
 
-## predicts the symbols
-for i in list:
 
-	plt.imshow(i[0])
-	plt.show(10)
-	print(i[0].shape)
-	print(i[1])
-	print(i[2])
-	flatten = i[0].flatten() / 255.0
-	pred = model.predict(flatten.reshape(1, 28, 28, 1))
-	print(pred.argmax())
-
-
-## sort the list wrt to the x-coordinates of centroid of symbols
-def simpleExpr(list):
-	return(sorted(list, key = lambda x: x[1]))     
-
-
-sorted=simpleExpr(list)
-
-x=[ i[2] for i in sorted]
-print(x)
+## sort the list wrt t the x-coordinates of centroid of symbols
+# def simpleExpr(list):
+# 	return(sorted(list, key = lambda x: x[1]))
+#
+#
+# sorted=simpleExpr(list)
+#
+# x=[ i[2] for i in sorted]
+# print(x)
