@@ -124,7 +124,11 @@ for cnt in contours:
 		M = cv2.moments(cnt)
 		Cx = M['m10'] / M['m00']
 		Cy = M['m01'] / M['m00']
-		list.append((gray,Cx,Cy))
+		small=[]
+		small.append(gray)
+		small.append(Cx)
+		small.append(Cy)
+		list.append(small)
 		#cv2.imwrite(str(i)+'.png',x)
 	i=i+1
 
@@ -154,7 +158,7 @@ for cnt in contours:
 		cv2.imwrite('/home/harshit/PycharmProjects/photomath/symbols/'+str(i)+".jpg",thresh[y-15:y+h+15,x-15:x+w+15])
 	i=i+1
 
-## predicts the symbols 
+## predicts the symbols
 for i in list:
 
 	plt.imshow(i[0])
@@ -165,3 +169,14 @@ for i in list:
 	flatten = i[0].flatten() / 255.0
 	pred = model.predict(flatten.reshape(1, 28, 28, 1))
 	print(pred.argmax())
+
+
+## sort the list wrt to the x-coordinates of centroid of symbols
+def simpleExpr(list):
+	return(sorted(list, key = lambda x: x[1]))     
+
+
+sorted=simpleExpr(list)
+
+x=[ i[2] for i in sorted]
+print(x)
