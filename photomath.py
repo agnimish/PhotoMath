@@ -9,7 +9,7 @@ pd.options.display.float_format = '{:,.2f}'.format
 
 
 #%%
-im = cv2.imread('5.jpeg',0)
+im = cv2.imread('images/5.jpg',0)
 # image = pyplot.imread('img1.jpg')
 
 
@@ -29,22 +29,22 @@ plt.show()
 ret,thresh1 = cv2.threshold(gblur_im,127,255,cv2.THRESH_BINARY)
 contours, hierarchy = cv2.findContours(thresh1,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 for cnt in contours:
-	x,y,w,h = cv2.boundingRect(cnt)
-	#bound the images
-	cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),3)
+    x,y,w,h = cv2.boundingRect(cnt)
+    #bound the images
+    cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),3)
 
 
 #%%
-i = 30
+i = 0
 for cnt in contours:
-	x,y,w,h = cv2.boundingRect(cnt)
-	#following if statement is to ignore the noises and save the images which are of normal size(character)
-	#In order to write more general code, than specifying the dimensions as 100,
-	# number of characters should be divided by word dimension
-	if (w>30 and h>30):#or(w>100 and h<30): 
-		#save individual images
-		cv2.imwrite(str(i)+".jpg",thresh1[y:y+h,x:x+w])
-		i=i+1
+    x,y,w,h = cv2.boundingRect(cnt)
+    #following if statement is to ignore the noises and save the images which are of normal size(character)
+    #In order to write more general code, than specifying the dimensions as 100,
+    # number of characters should be divided by word dimension
+    if (w>50 and h>50):#or(w>100 and h<30): 
+        #save individual images
+        cv2.imwrite(str(i)+".jpg",thresh1[y:y+h,x:x+w])
+        i=i+1
 
 
 #%%
@@ -91,24 +91,24 @@ plt.imshow(resized_img)
 
 
 #%%
-j = 0
-for i in range(4, 11):
-    img = cv2.imread(str(i)+".jpeg", 0)
+for i in range(1,2):
+    img = cv2.imread("images/"+str(i)+".jpg", 0)
     gblur = cv2.GaussianBlur(img, (11,11), 0)
     ret,thresh1 = cv2.threshold(gblur,127,255,cv2.THRESH_BINARY)
     contours, hierarchy = cv2.findContours(thresh1,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     for cnt in contours:
         x,y,w,h = cv2.boundingRect(cnt)
         #bound the images
-        cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),3)
+        cv2.rectangle(im,(x-15,y-15),(x+w+15,y+h+15),(0,255,0),3)
+    j = 1
     for cnt in contours:
         x,y,w,h = cv2.boundingRect(cnt)
         #following if statement is to ignore the noises and save the images which are of normal size(character)
         #In order to write more general code, than specifying the dimensions as 100,
         # number of characters should be divided by word dimension
-        if (w>30 and h>30):#or(w>100 and h<30): 
+        if (w>20 and h>50):#or(w>100 and h<30): 
             #save individual images
-            cv2.imwrite(str(j)+".jpg",thresh1[y:y+h,x:x+w])
+            cv2.imwrite("new_dataset/"+str(i)+"/"+str(j)+".jpg",thresh1[y-15:y+h+15,x-15:x+w+15])
             j=j+1
 
 
